@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeuralNeko Daily Box</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* kawaii pastel mix - cat vibes */
+      --bg: #e224e2;
+      --card: #fff2ff;
+      --accent: #ff55ff; /* pink */
+      --accent-2: #8aabff; /* pastel blue */
+      --accent-3: #e4c7a3; /* soft peach */
+      --text: #831383;
+      --muted: #6d4462;
+      --shadow: rgba(21, 17, 22, 0.12);
+    }
+
+    /* reset & base */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg, #ffa6ff 0%, #82cdff 100%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* app container - mobile-first, centered vertically */
+    .container{
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      background:var(--card);
+      border-radius:20px;
+      box-shadow: 0 12px 30px var(--shadow);
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      align-items:center;
+    }
+
+    header{ text-align:center; padding-top:6px; padding-bottom:4px; }
+    h1{ margin:0; font-size:18px; letter-spacing:0.2px; }
+    p.lead{ margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .envelope-icon1{
+      width:15px;
+      height:15px;
+      vertical-align:middle;
+      margin-left:4px;
+      margin-bottom:4px;
+    }
+    .envelope-icon{
+      width:30px;
+      height:30px;
+    }
+    /* the box area */
+    .stage{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      position:relative;
+      min-height:260px;
+    }
+
+    /* cute box */
+    .gift-box{
+      width:170px;
+      height:120px;
+      border-radius:14px;
+      background: linear-gradient(40deg,#5ca7fc ,#ffc4e0);
+      position:relative;
+      box-shadow: 0 12px 30px rgba(48, 57, 75, 0.322);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .gift-box:active{
+         transform: translateY(4px) scale(.1) 
+    }
+
+    .box-top {
+      position:absolute;
+      top:0;left:0;right:0;height:34%;
+      background:linear-gradient(180deg, rgba(45, 86, 223, 0.5),#ff71ff);
+      border-top-left-radius:14px;border-top-right-radius:14px;
+      z-index:3; transform-origin:center;
+      transition: transform .6s cubic-bezier(.2,.9,.2,1);
+    }
+
+    /* envelope element that appears above the box */
+    .envelope-wrap{
+      position:absolute;
+      bottom:40px; /* start inside box */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      width:220px;
+      height:160px;
+      transform-origin:center;
+      transition: transform .45s ease, opacity .3s ease;
+      opacity:0;
+    }
+    .envelope {
+      width:190px;
+      height:110px;
+      border-radius:12px;
+      background: linear-gradient(180deg,#cbd9ff,#fffefc);
+      border: 1px solid rgba(0,0,0,0.05);
+      position:relative;
+      box-shadow: 0 10px 30px rgba(39, 30, 37, 0.08);
+      display:flex;align-items:center;justify-content:center;
+      pointer-events:auto;
+    }
+    .env-flap{
+      position:absolute;left:0;right:0;top:0;height:58%;
+      background: linear-gradient(180deg,#5ca7fc,#ffc4e0);
+      border-top-left-radius:12px;border-top-right-radius:12px;
+      z-index:5; transform-origin: top center;
+      transition: transform .5s cubic-bezier(.2,.9,.2,1);
+      display:flex; align-items:center; justify-content:center; font-weight:700; color:#9b3a64;
+    }
+    .env-body{
+      position:absolute; left:0; right:0; bottom:0; height:56%;
+      display:flex; align-items:center; justify-content:center; text-align:center;
+      padding:10px; color:var(--muted); font-size:14px;
+    }
+    .ribbon{
+      position:absolute;
+      top:24%;
+      background: var(--bg);
+      color:#fff;
+      padding:6px 14px;
+      font-size:13px;
+      border-radius:8px;
+      box-shadow: 0 6px 16px rgba(255, 85, 255, 0.2);
+      z-index:4;
+    }
+    /* visible when popped */
+    .popped .envelope-wrap{ opacity:1; transform: translateY(-46px) scale(1); pointer-events:auto; }
+    .popped .box-top{ transform: translateY(-12px) rotateX(12deg); }
+
+    /* when opened */
+    .opened .env-flap{ transform: rotateX(180deg) translateY(-6px); }
+    .opened .env-body{ transform: translateY(-8px); }
+
+    /* info text + gif */
+    .below{
+      width:100%;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:center;
+      flex-direction:row;
+    }
+    .note{
+      font-size:13px;
+      color:var(--muted);
+      text-align:left;
+      max-width:320px;
+    }
+    .gif{
+      width:72px;
+      height:72px;
+      border-radius:10px;
+      overflow:hidden;
+      flex-shrink:0;
+      background:linear-gradient(180deg,#fff,#fff0fb);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 8px 20px rgba(29, 21, 25, 0.06);
+    }
+    .gif img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* modal */
+    .modal-backdrop{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(18,6,18,0.35); z-index:9999; padding:16px; }
+    .modal {
+      width:100%; max-width:420px; background:white; border-radius:14px; padding:18px; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal .emoji{ font-size:28px; }
+    .modal .msg { font-size:16px; margin:12px 0; color:#3a2b36; }
+    .modal .meta { font-size:12px; color:var(--muted); margin-bottom:8px; }
+    .modal .actions{ display:flex; gap:8px; justify-content:center; margin-top:10px; }
+    .btn {
+      padding:10px 14px; border-radius:10px; border:0; font-weight:700; cursor:pointer;
+    }
+    .btn-primary{ background: linear-gradient(180deg,var(--accent),var(--accent-2)); color:#ffffff; }
+    .btn-ghost{ background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--muted); }
+
+    /* small screens & mobile tweaks */
+    @media (max-width:420px){
+      .container{ padding:14px; border-radius:16px; }
+      .stage{ min-height:220px; padding:6px; }
+      .gift-box{ width:150px; height:110px; }
+      .envelope-wrap{ width:200px; height:140px; bottom:32px; }
+      .envelope{ width:170px; height:100px; }
+      .gif{ width:60px; height:60px; }
+      .note{ font-size:12px; max-width:220px; }
+      .modal { padding:14px; }
+      .modal .msg { font-size:15px; }
+    }
+
+    @media (max-width:320px){
+      .gift-box{ width:140px; height:98px; }
+      .envelope{ width:150px; height:88px; }
+    }
+
+    /* playful tiny motion */
+    .idle-wiggle {
+      animation: floaty 3.8s ease-in-out infinite;
+      transform-origin:center;
+    }
+    @keyframes floaty {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(-0.6deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container" role="application" aria-label="HappyVibez daily box">
+    <header>
+      <h1>HappyVibez Your Daily Envelope</h1>
+      <p class="lead">
+        Tap the box. One envelope a day make it count 
+        <img src="mail-with-heart.png" alt="envelope" class="envelope-icon1" />
+      </p>
+    </header>
+
+    <main class="stage" id="stage">
+      <!-- box -->
+      <div id="box" class="gift-box idle-wiggle" role="button" aria-pressed="false" aria-label="Open today's envelope">
+        <div class="ribbon">Open me </div>
+        <div class="box-top"></div>
+      </div>
+
+      <!-- envelope that will pop out -->
+      <div class="envelope-wrap" id="envelopeWrap" aria-hidden="true">
+        <div id="envelope" class="envelope" role="button" aria-label="Envelope">
+          <div class="env-flap"><img src="envelope.png" alt="envelope" class="envelope-icon"></div>
+          <div class="env-body" id="envBody">Tap to open me!</div>
+        </div>
+      </div>
+    </main>
+
+    <div class="below" aria-hidden="false">
+      <div class="note" id="noteText">
+        You have only one envelope today click the box to see it. (You can view it again today.)
+      </div>
+      <div class="gif" aria-hidden="true">
+        <!-- lightweight cat gif: classic cute gif (you can replace URL with your preferred) -->
+        <img src="oh-hey-oh-hey-there.gif" alt="cute cat gif" />
+      </div>
+    </div>
+  </div>
+
+  <!-- modal template (in DOM for simplicity) -->
+  <template id="modalTpl">
+    <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+      <div class="modal" role="document">
+        <div class="emoji">💌</div>
+        <div class="msg" id="modalMessage"></div>
+        <div class="meta" id="modalMeta"></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="modalClose">Thanks!</button>
+          <button class="btn btn-ghost" id="modalCopy">Copy</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    // ---------- messages (fixed list, kawaii + supportive) ----------
+    const MESSAGES = [
+      "You are doing great today keep going, kitty believes in you! 🐾",
+      "Take a tiny break and sip something warm you deserve it. ☕️",
+      "Little steps every day are still progress. ✨",
+      "Your kindness is louder than you think keep shining. 🌟",
+      "It’s okay to rest. Rest helps you grow. 🌙",
+      "You are stronger than you realize breathe and continue. 💪",
+      "Smile you’re doing better than you say. 😺",
+      "A small act of courage today becomes a big story tomorrow. 🦋",
+      "Send yourself the gentleness you give others. 🌷",
+      "You matter. One day at a time. ❤️"
+    ];
+
+    // ---------- storage keys ----------
+    const KEY_OPENED_DATE = 'hv_box_opened_date_v1';
+    const KEY_OPENED_INDEX = 'hv_box_opened_index_v1';
+
+    // ---------- helpers ----------
+    function todayKey(){
+      const d = new Date();
+      return d.toISOString().slice(0,10);
+    }
+
+    function getOpenedInfo(){
+      const date = localStorage.getItem(KEY_OPENED_DATE);
+      const idx = localStorage.getItem(KEY_OPENED_INDEX);
+      return { date, idx: idx !== null ? parseInt(idx,10) : null };
+    }
+
+    function setOpenedInfo(index){
+      localStorage.setItem(KEY_OPENED_DATE, todayKey());
+      localStorage.setItem(KEY_OPENED_INDEX, String(index));
+    }
+
+    // ---------- UI elements ----------
+    const box = document.getElementById('box');
+    const stage = document.getElementById('stage');
+    const envelopeWrap = document.getElementById('envelopeWrap');
+    const envelope = document.getElementById('envelope');
+    const envBody = document.getElementById('envBody');
+    const noteText = document.getElementById('noteText');
+
+    // modal
+    const modalTpl = document.getElementById('modalTpl');
+
+    // state
+    let popped = false;
+    let opened = false; // opened envelope open state (flap rotated)
+    let chosenIndex = null;
+
+    // initialize - if already opened today, show popped & allow viewing
+    (function init(){
+      const openedInfo = getOpenedInfo();
+      if(openedInfo.date === todayKey() && openedInfo.idx !== null){
+        chosenIndex = openedInfo.idx;
+        // show popped but closed (user can open to see same message)
+        showPopped(false);
+        noteText.textContent = "You already opened today's envelope tap it to view the same message again.";
+      } else {
+        // not opened today
+        noteText.textContent = "You have only one envelope today 💌 click the box to see it. (You can view it again today.)";
+      }
+      // accessibility: keyboard enter opens box
+      box.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') handleBoxClick() });
+      envelope.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') handleEnvelopeClick() });
+    })();
+
+    // pick a random message index deterministic when needed
+    function randomIndex(){
+      return Math.floor(Math.random() * MESSAGES.length);
+    }
+
+    // show popped envelope animation (optionally open immediately)
+    function showPopped(openImmediately = false){
+      popped = true;
+      envelopeWrap.setAttribute('aria-hidden','false');
+      stage.classList.add('popped');
+      // make envelope interactive
+      envelope.style.pointerEvents = 'auto';
+      // flap closed initially
+      envelope.classList.remove('open');
+      opened = false;
+      if(openImmediately){
+        setTimeout(()=> openEnvelope(), 360);
+      }
+    }
+
+    // show closed state
+    function hidePopped(){
+      popped = false;
+      stage.classList.remove('popped');
+      envelopeWrap.setAttribute('aria-hidden','true');
+      envelope.style.pointerEvents = 'none';
+      opened = false;
+    }
+
+    // open envelope (animate flap & then show modal)
+    function openEnvelope(){
+      if(opened) {
+        // already opened -> show modal again
+        showModalWithMessage(chosenIndex);
+        return;
+      }
+      opened = true;
+      envelope.classList.add('open');
+      // show modal after animation
+      setTimeout(()=>{
+        showModalWithMessage(chosenIndex);
+      }, 420);
+    }
+
+    // create and show modal with message
+    function showModalWithMessage(index){
+      const node = modalTpl.content.cloneNode(true);
+      const backdrop = node.querySelector('.modal-backdrop');
+      const msgEl = node.getElementById('modalMessage');
+      const meta = node.getElementById('modalMeta');
+      const closeBtn = node.getElementById('modalClose');
+      const copyBtn = node.getElementById('modalCopy');
+
+      const text = MESSAGES[index];
+      msgEl.textContent = text;
+      meta.textContent = `Envelope • ${todayKey()}`;
+
+      // close handler
+      function closeHandler(){
+        document.body.removeChild(backdrop);
+      }
+      closeBtn.addEventListener('click', closeHandler);
+      // backdrop click closes
+      backdrop.addEventListener('click', (ev) => {
+        if(ev.target === backdrop) closeHandler();
+      });
+
+      // copy handler
+      copyBtn.addEventListener('click', ()=>{
+        navigator.clipboard?.writeText(text).then(()=> {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(()=> copyBtn.textContent = 'Copy', 900);
+        }).catch(()=> {
+          copyBtn.textContent = 'Copy';
+        });
+      });
+
+      document.body.appendChild(backdrop);
+    }
+
+    // flow: click box -> pop envelope (if not yet popped) and store chosen index if first time today
+    function handleBoxClick(){
+      const openedInfo = getOpenedInfo();
+      if(openedInfo.date === todayKey() && openedInfo.idx !== null){
+        // already opened today -> show popped & open modal for same message
+        chosenIndex = openedInfo.idx;
+        showPopped(false);
+        // open envelope immediately to reveal message when user taps the envelope
+        // optional: open immediately:
+        // openEnvelope();
+        noteText.textContent = "You already opened today's envelope tap it to view the same message again.";
+        return;
+      }
+
+      // first click today: pop envelope and pick a message
+      chosenIndex = randomIndex();
+      setOpenedInfo(chosenIndex);
+      showPopped(false);
+
+      noteText.textContent = "You opened today's envelope tap the envelope to read your message.";
+      // small visual cue: auto-open a moment after popping for delight (comment out if you prefer manual)
+      setTimeout(()=> {
+        // auto open envelope for delightful flow
+        openEnvelope();
+      }, 700);
+    }
+
+    // envelope click -> reveal message (if popped)
+    function handleEnvelopeClick(){
+      if(!popped){
+        // safety: if envelope not popped but clicked, pop it
+        handleBoxClick();
+        return;
+      }
+      // open / re-open
+      openEnvelope();
+    }
+
+    // attach events
+    box.addEventListener('click', handleBoxClick);
+    envelope.addEventListener('click', handleEnvelopeClick);
+
+    // small a11y: enable keyboard focus
+    box.setAttribute('tabindex', '0');
+    envelope.setAttribute('tabindex', '0');
+
+    // prevent long tap highlight on mobile
+    document.addEventListener('touchstart', function(){}, {passive:true});
+
+    // Ensure envelope body text updates based on whether chosenIndex known
+    const obs = new MutationObserver(()=>{});
+    // fallback: update envBody text whenever popped state changes
+    const updateBodyText = () => {
+      if(!popped) envBody.textContent = 'Tap the box to pull out an envelope';
+      else envBody.textContent =  'Tap to open me!';
+    };
+    // small interval to refresh body state (cheap and safe)
+    setInterval(updateBodyText, 200);
+
+    // prevent multiple picks per day if user clears storage accidentally:
+    // if localStorage cleared, normal flow picks new index next day (intended)
+  </script>
+</body>
+</html>
