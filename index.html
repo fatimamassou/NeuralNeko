@@ -33,7 +33,9 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
     }
-
+    #box {
+      cursor: pointer;
+    }
     /* app container - mobile-first, centered vertically */
     .container{
       width:100%;
@@ -88,6 +90,7 @@
       cursor:pointer;
       transition:transform .18s ease, box-shadow .18s ease;
       -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
     }
     .gift-box:active{
          transform: translateY(4px) scale(.1) 
@@ -150,6 +153,7 @@
       border-radius:8px;
       box-shadow: 0 6px 16px rgba(255, 85, 255, 0.2);
       z-index:4;
+      cursor: pointer;
     }
     /* visible when popped */
     .popped .envelope-wrap{ opacity:1; transform: translateY(-46px) scale(1); pointer-events:auto; }
