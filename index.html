@@ -363,7 +363,7 @@
         noteText.textContent = "You already opened today's envelope tap it to view the same message again.";
       } else {
         // not opened today
-        noteText.textContent = "You have only one envelope today click the box to see it. (You can view it again today.)";
+        noteText.textContent = "You have only one envelope today click the box to see it.(You can view it again today.)";
       }
       // accessibility: keyboard enter opens box
       box.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') handleBoxClick() });
