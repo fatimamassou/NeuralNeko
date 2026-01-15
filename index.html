@@ -457,9 +457,6 @@
         // already opened today -> show popped & open modal for same message
         chosenIndex = openedInfo.idx;
         showPopped(false);
-        // open envelope immediately to reveal message when user taps the envelope
-        // optional: open immediately:
-        // openEnvelope();
         noteText.textContent = "You already opened today's envelope tap it to view the same message again.";
         return;
       }
